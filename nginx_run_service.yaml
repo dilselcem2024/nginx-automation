@@ -1,37 +1,26 @@
 #Playbook about NGINX installtion with Ansible
-- hosts: webservice 
-  become: yes
-  tasks: 
-  	- name: nginx installation 
-  	  yum:
-  	     name: nginx installation 
-  	     state: lastest
+name: Configure webserver with nginx
+  hosts: localhost
+  become: True
+  tasks:
+    - name: install nginx
+      apt: name=nginx update_cache=yes
 
-  	- name: Creates Archive Directory 
-  	  file: 
-  	     path: /var/www/html
-  	     state: directory
-  	     owner: root
-  	     group: root 
-  	     mode: '0755'
+    - name: copy nginx config file
+      copy: src=files/nginx.conf dest=/etc/nginx/sites-available/default
 
-        - name: Copy Archive index.html template
-  	  copy: 
-  	     src: index.html
-  	     dest: /var/www/html
-  	     owner: root
-  	     group: root 
-  	     mode: '0644'
+    - name: enable configuration
+      file: >
+        dest=/etc/nginx/sites-enabled/default
+        src=/etc/nginx/sites-available/default
+        state=link
 
-        - name: Copy archive configuracion nginx 
-  	  copy: 
-  	     src: configNGNIX.conf
-  	     dest: /etc/nginx/conf.d/
-  	     owner: root
-  	     group: root 
-  	     mode: '0644'
-  	   
-        - name: Service start of NGNIX
-  	  service: 
-  	     name: nginx 
-  	     state: started
+    - name: copy index.html
+      template: src=templates/index.html dest=/usr/share/nginx/html/index.html
+        mode=0644
+
+    - name: restart nginx
+      service: name=nginx state=restarted
+
+
+
