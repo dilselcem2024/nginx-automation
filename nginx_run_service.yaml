@@ -1,0 +1,37 @@
+#Playbook about NGINX installtion with Ansible
+- hosts: webservice 
+  become: yes
+  tasks: 
+  	- name: nginx installation 
+  	  yum:
+  	     name: nginx installation 
+  	     state: lastest
+
+  	- name: Creates Archive Directory 
+  	  file: 
+  	     path: /var/www/html
+  	     state: directory
+  	     owner: root
+  	     group: root 
+  	     mode: '0755'
+
+        - name: Copy Archive index.html template
+  	  copy: 
+  	     src: index.html
+  	     dest: /var/www/html
+  	     owner: root
+  	     group: root 
+  	     mode: '0644'
+
+        - name: Copy archive configuracion nginx 
+  	  copy: 
+  	     src: configNGNIX.conf
+  	     dest: /etc/nginx/conf.d/
+  	     owner: root
+  	     group: root 
+  	     mode: '0644'
+  	   
+        - name: Service start of NGNIX
+  	  service: 
+  	     name: nginx 
+  	     state: started
